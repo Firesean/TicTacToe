@@ -12,15 +12,15 @@ class Interface:
                                 height=window_size)
         self.cursor = None
         self.game = game
+        self.menu_bar = None
+        self.player_menu = None
         self.reference = []
         self.window_size = window_size
 
         # Main
-        self.root.bind("<Motion>", lambda event: self.display_current_player(event))
-        self.root.bind("<Button-1>", lambda event: self.place_marker(event))
-        self.root.iconbitmap("FireIcon32x32.ico")
-        self.root.title(type(self.game).__name__)
+        self.set_binds()
         self.create_interface()
+        self.set_menu()
         self.root.mainloop()
 
     def change_current_player(self):
@@ -34,9 +34,11 @@ class Interface:
 
 
     def create_interface(self):
-        self.cursor = self.canvas.create_text(100, 100, text="")
+        self.cursor = self.canvas.create_text(0, 0, text="")
         self.draw_lines()
         self.canvas.pack()
+        self.root.iconbitmap("FireIcon32x32.ico")
+        self.root.title(type(self.game).__name__)
         self.root.geometry("{0}x{0}".format(self.window_size))
 
     def display_current_player(self, event=None):
@@ -103,5 +105,17 @@ class Interface:
                     tk.messagebox.showinfo(title, message)
                     self.clear_interface()
                     self.game.new_board()
+
+    def set_menu(self):
+        self.menu_bar = tk.Menu(self.root)
+        self.player_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.player_menu.add_radiobutton(label="One Player", command=lambda:print("One"))
+        self.player_menu.add_radiobutton(label="Two Players", command=lambda:print("Two"))
+        self.menu_bar.add_cascade(label="Players", menu=self.player_menu)
+        self.root.config(menu=self.menu_bar)
+
+    def set_binds(self):
+        self.root.bind("<Motion>", lambda event: self.display_current_player(event))
+        self.root.bind("<Button-1>", lambda event: self.place_marker(event))
 
 
