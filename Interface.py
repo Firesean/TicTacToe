@@ -1,3 +1,4 @@
+from Player import Player
 import tkinter as tk
 from tkinter import messagebox
 class Interface:
@@ -23,17 +24,17 @@ class Interface:
         self.set_menu()
         self.root.mainloop()
 
-    def change_current_player(self):
+    def change_current_player(self) -> None:
         index = self.game.players.index(self.get_current_player())
         self.game.set_current_player(self.game.players[index-1])
 
-    def clear_interface(self):
+    def clear_interface(self) -> None:
         self.reference = []
         self.canvas.delete("all")
         self.create_interface()
 
 
-    def create_interface(self):
+    def create_interface(self) -> None:
         self.cursor = self.canvas.create_text(0, 0, text="")
         self.draw_lines()
         self.canvas.pack()
@@ -41,15 +42,16 @@ class Interface:
         self.root.title(type(self.game).__name__)
         self.root.geometry("{0}x{0}".format(self.window_size))
 
-    def display_current_player(self, event=None):
+    def display_current_player(self, event=None) -> None:
         if event:
             initial = self.get_current_player().get_initial()
             self.canvas.itemconfigure(self.cursor, text=initial,
-                                      font="TimesNewRoman {0} bold".format(int(self.get_offset()/self.game.get_in_a_row())))
+                                      font="TimesNewRoman {0} bold".format(int(self.get_offset()/self.game.get_board_size())))
             self.canvas.coords(self.cursor, event.x, event.y)
 
-    def draw_lines(self):
-        for line in range(self.game.get_in_a_row()):
+    def draw_lines(self) -> None:
+        self.canvas.create_rectangle(2,2, self.get_window_size(), self.get_window_size())
+        for line in range(self.game.get_board_size()):
             self.canvas.create_line(0, line*self.get_spacer(),
                                     self.get_window_size(),
                                     line * self.get_spacer())
@@ -57,33 +59,33 @@ class Interface:
                                     line * self.get_spacer(),
                                     self.get_window_size())
 
-    def draw_marker(self, row, col, player):
+    def draw_marker(self, row, col, player) -> None:
         if self.game.is_empty_spot(row, col):
             self.reference.append(self.canvas.create_text(row*self.get_spacer()+self.get_offset(),
                                                           col* self.get_spacer()+self.get_offset(),
                                                           str(player.get_initial()),
                                                           font="TimesNewRoman {0} bold".format(player.get_initial())))
 
-    def get_current_player(self):
+    def get_current_player(self) -> Player:
         return self.game.get_current_player()
 
-    def get_offset(self):
+    def get_offset(self) -> int:
         return int(self.get_spacer() / 2)
 
-    def get_row_col_with_xy(self, x, y):
+    def get_row_col_with_xy(self, x, y) -> tuple:
         spacer = self.get_spacer()
         offset = self.get_offset()
         x = int(x / spacer)
         y = int(y / spacer)
         return x, y
 
-    def get_spacer(self):
-        return int(self.get_window_size() / self.game.get_in_a_row())
+    def get_spacer(self) -> int:
+        return int(self.get_window_size() / self.game.get_board_size())
 
-    def get_window_size(self):
+    def get_window_size(self) -> int:
         return self.window_size
 
-    def place_marker(self, event=None):
+    def place_marker(self, event=None) -> None:
         if event:
             spacer = self.get_spacer()
             offset = self.get_offset()
@@ -106,7 +108,7 @@ class Interface:
                     self.clear_interface()
                     self.game.new_board()
 
-    def set_menu(self):
+    def set_menu(self) -> None:
         self.menu_bar = tk.Menu(self.root)
         self.player_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.player_menu.add_radiobutton(label="One Player", command=lambda:print("One"))
@@ -114,7 +116,7 @@ class Interface:
         self.menu_bar.add_cascade(label="Players", menu=self.player_menu)
         self.root.config(menu=self.menu_bar)
 
-    def set_binds(self):
+    def set_binds(self) -> None:
         self.root.bind("<Motion>", lambda event: self.display_current_player(event))
         self.root.bind("<Button-1>", lambda event: self.place_marker(event))
 
